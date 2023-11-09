@@ -1,0 +1,9 @@
+/build
+/trash
+/sandbox
+*~
+poetry.lock
+.venv
+*/data*
+*.pyc
+/test

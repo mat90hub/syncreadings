@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "syncreadings"
+version = "0.1.0"
+description = "Synchronized measures readings into table."
+authors = ["Mathieu Pouit <mathieu.pouit@orange.fr>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10, <3.13"
+pandas = "^2.1.1"
+path = "^16.7.1"
+tk = "^0.1.0"
+openpyxl = "^3.1.2"
+tabulate = "^0.9.0"
+tkhtmlview = "^0.2.0"
+pip = "^23.3.1"
+esbonio = "^0.16.2"
+docutils = "^0.20.1"
+matplotlib = "^3.8.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^3.0"
+
+[too.pyright]
+include =[
+    "lib",
+    "test",
+    "utils"
+]
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+]
+defineConstant = { DEBUG = true }
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+

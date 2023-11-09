@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  
+  <body>
+
+  <h2>General presentation.</h2>
+
+  <p>The objective of this application is to reorganize sets of measures readings made
+  at fixed time intervalle into a table of synchronized measures, which means a
+  table with a single time column applicable to all readings on each line.</p>
+
+  <img alt="sets into a table" class="align-center" src="./lib/html/settable.png" style="width: 762px;" />
+  
+  <p>The instruments are storing readings at fixed intervalle, but all instruments may
+  not be using the same intervalle. The issue will be then on the way to gather
+  those readings, so they can correspond to the same time. The default solution is
+  to select only the measure, which are made at matching time.</p>
+
+
+  <h2>User instructions.</h2>
+
+  <p>The application screen is made of a menu, an internal frame and a status line
+  placed at the bottom. The status line will give continuous information on our
+  status in the application.</p>
+
+  <p>The first user action should be to load a sets of data with the commande
+  <cite>Load File</cite> from the menu <cite>Input File</cite>. The sets of data is shown in the
+  frame in the background. The next actions are with the menu <cite>Data Table</cite>,
+  either to obtain information on the sets <cite>Sets Analysis</cite> or to transfer the
+  set into a table of synchronized measures with <cite>Format into table</cite>. When
+  the sets are moved into a table, it is shown in the frame in the background,
+  replacing the former sets.</p>
+  
+  <p>Then the user can choose to export the table either in a <strong>csv</strong> table or
+  a <strong>xlsx</strong>. Otherwise, the user can also close the file with this commande
+  under the menu <cite>Input File</cite> or exit the application.</p>
+    
+  </body>
+</html>
