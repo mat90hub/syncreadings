@@ -53,7 +53,7 @@ Some other directories are diving additional resources, as detailed below.
       - data files used for demonstration.
     * - `/doc`
       - source file for the application documentation.
-    * - `/build`
+    * - `/doc/_build`
       - documentation automatically generated (sphinx).
     * - `/utils`
       - scripts for supporting distributions and others

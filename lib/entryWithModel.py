@@ -1,4 +1,6 @@
 import tkinter as tk
+from tkinter import ttk
+from ttkthemes import ThemedTk
 
 def isfloat(num):
     try:
@@ -9,35 +11,56 @@ def isfloat(num):
 
 class EntryWithModel(tk.Entry):
     """Entry widget with a model."""
-    def __init__(self, master,    
-                 model=" sin(x) ",
-                 model_color="grey",
-                 min = None,
-                 max = None,
-                 err_bg_col="red",
-                 err_fg_col="yellow",
-                 **kwargs):
-        super().__init__(master, **kwargs)
-        self.MODEL_TEXT = model
-        self.MODEL_COLOR = model_color
-        self.IS_EMPTY = True
+    def __init__(self, master, **kwargs):
         
+        # recover all particular new parameters
+        # from kwargs (avoid mixing)
+        if 'model' in kwargs:
+            self.MODEL_TEXT = kwargs.pop('model')
+        else:
+            self.MODEL_TEXT = " sin(x)"
+        
+        if 'model_color' in kwargs:
+            self.MODEL_COLOR = kwargs.pop('model_color')
+        else:
+            self.MODEL_COLOR="grey"
+        
+        if 'err_bg_col' in kwargs:
+            self.ERR_BG_COLOR = kwargs.pop('err_bg_col')
+        else:
+            self.ERR_BG_COLOR='red'
+        
+        if 'err_fg_col' in kwargs:
+            self.ERR_FG_COLOR = kwargs.pop('err_fg_col')
+        else:
+            self.ERR_FG_COLOR='yellow'
+        
+        if 'min' in kwargs:
+            self.MIN = kwargs.pop('min')        
+        else:
+            self.MIN = 0
+
+        if 'max' in kwargs:
+            self.MAX = kwargs.pop('max')
+        else:
+            self.MAX = 100
+
+        # the standard parameters, that may be absent
+        if 'width' not in kwargs and self.MODEL_TEXT is not None:
+            self.WIDTH = len(self.MODEL_TEXT) + 2
+        
+        # initialize the remaining parameters
+        super().__init__(master, **kwargs)
+        
+        # other initializations
+        self.IS_EMPTY = True
         self.FG_COLOR = self.cget("foreground")
         self.BG_COLOR = self.cget("background")
-        self.ERR_BG_COLOR = err_bg_col
-        self.ERR_FG_COLOR = err_fg_col
-
-        self.MIN = min
-        self.MAX = max
         self.ENTRY_ERR = False
+        
+        super().insert(0, self.MODEL_TEXT)
+        super().configure(foreground=self.MODEL_COLOR)
 
-        if 'width' not in kwargs:
-            self.WIDTH = len(self.MODEL_TEXT) + 2
-            self.configure(width=self.WIDTH)
-        
-        self.configure(foreground=self.MODEL_COLOR)
-        self.insert(0, self.MODEL_TEXT)               
-        
         self.bind("<FocusIn>", self.on_focus_in)
         self.bind("<FocusOut>", self.on_focus_out)
         self.bind("<Return>", self.on_focus_out)
@@ -75,11 +98,19 @@ class EntryWithModel(tk.Entry):
                 return self.MODEL_TEXT
             case "model_color":
                 return self.MODEL_COLOR
+            case "error_fg_color":
+                return self.ERR_FG_COLOR
+            case "error_bg_color":
+                return self.ERR_BG_COLOR
+            case "min":
+                return self.MIN
+            case "max":
+                return self.MAX
             case _:
                 return super().cget(property_name)
             
     def enter(self, value):
-        """simulate a user entry"""
+        """simulate a user entry."""
         self.delete(0, tk.END)
         self.insert(0, value)
         self.configure(foreground=self.FG_COLOR,
@@ -126,40 +157,55 @@ class EntryWithModel(tk.Entry):
                        background=self.ERR_BG_COLOR)
 
 if __name__ == "__main__":
-    
-    root = tk.Tk()
+     
+    # root = ThemedTk(theme='keramic')
+    root = ThemedTk(theme='arc')
     root.title("Test entry with model.")
-    frame = tk.Frame(root,width=15, height=6)
-    frame.pack(expand=True)
+    root.geometry("1200x400")
+
+    style = ttk.Style()
+    style.configure('red.TFrame', background='red')
+
+    frame = ttk.Frame(root, height = 80, width=1200)
+    frame.grid(row=0, column=0, sticky='nsew')
+    frame.configure(style='red.TFrame')
+    
+    # for the root window to be totally filled
+    root.columnconfigure(0, weight=1)
+    root.rowconfigure(0, weight=1)
+
+    # idem for the frame
+    frame.grid_columnconfigure(0, minsize=30, pad=5, weight=1)
+    frame.grid_columnconfigure(1, minsize=30, pad=5, weight=1)
+    frame.grid_columnconfigure(2, minsize=30, pad=5, weight=1)
+    frame.grid_rowconfigure(0, minsize=30, pad=10, weight=0)
+    frame.grid_rowconfigure(1, minsize=30, pad=10, weight=0)
+    frame.grid_rowconfigure(2, minsize=30, pad=10, weight=1)
 
     entryWithModel = EntryWithModel(frame)
-    entryWithModel.pack()
-
-    frame2 = tk.Frame(root, width = 15)
-    frame2.pack(expand=True, fill=tk.BOTH)
+    entryWithModel.grid(row=0, column=0, columnspan=3, pady=20, padx=20, sticky='ew')
     
-    tk.Label(frame2, text="result:", width=6, anchor="w", justify="right").pack(side=tk.LEFT, padx=20, pady=20)
-    result = tk.Label(frame2, width=44, anchor="w", justify="left")
-    result.pack(side=tk.LEFT, padx=20, pady=30)
-
-    frame_btn = tk.Frame(root)
-    frame_btn.pack(side=tk.BOTTOM, expand=True)
+    res_lbl = ttk.Label(frame, text="result:", width=6, anchor="w", justify="right")
+    res_lbl.grid(row=1, column=0, sticky='e', pady=20)
+    result = ttk.Label(frame, width=44, anchor="w", justify="left")
+    result.grid(row=1, column=1, columnspan=2, sticky='ew', padx=20, pady=20)
 
     # rapid and rough check of configure for new and old properties
-    button_bg = tk.Button(frame_btn, text='change background', 
-                          command=lambda: {entryWithModel.configure(background="white", foreground="black") 
-                                           if (entryWithModel.cget("background") == "blue") 
-                                           else entryWithModel.configure(background="blue", foreground="white")})
-    button_bg.pack(side=tk.LEFT, padx=20, pady=20)
+    button_mdl = ttk.Button(frame, text='ch mdl',
+                            command=lambda: {entryWithModel.configure(model=" arctan(x) ")
+                                            if (entryWithModel.cget("model")==" sin(x)")
+                                            else entryWithModel.configure(model=" sin(x)")})
+    button_mdl.grid(row=3, column=0, padx=40, pady=20)
 
-    button_mdl = tk.Button(frame_btn, text='change model',
-                           command=lambda: {entryWithModel.configure(model="arctan(x)")
-                                            if (entryWithModel.cget("model")=="sin(x)")
-                                            else entryWithModel.configure(model="sin(x)")})
-    button_mdl.pack(padx=20, pady=20)
+    button_bg = ttk.Button(frame, text='chge bg',
+                           command=lambda: {entryWithModel.configure(background="white", foreground="black") 
+                                            if (entryWithModel.cget("background") == "blue")
+                                            else entryWithModel.configure(background="blue", foreground="white")})
+    button_bg.grid(row=3, column=1, padx=40, pady=20, sticky='e')
 
-    button_close = tk.Button(frame2, text='close', 
-                             command=lambda: root.destroy())
-    button_close.pack(side=tk.RIGHT)
+    
+    button_close = ttk.Button(frame, text='close', command=lambda: root.destroy())
+    button_close.grid(row=3, column=2, padx=40, pady=20, sticky='e')
+    
     root.mainloop()
 

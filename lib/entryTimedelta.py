@@ -49,21 +49,27 @@ def strftimedelta(time_delta: timedelta) -> str:
     
 
 class EntryTimedelta(EntryWithModel):
-    def __init__(self, master,    
-                 model="00h 00min 00.000s",
-                 model_color="grey",
-                 **kwargs):
+    def __init__(self, master, **kwargs):
+
         super().__init__(master, **kwargs)
-        self.MODEL_TEXT = model
-        self.MODEL_COLOR = model_color
+
+        if 'model' in kwargs:
+            self.MODEL_TEXT = kwargs.pop('model')
+        else:
+            self.MODEL_TEXT = "00h 00min 00.000s"
+        if 'model_color' in kwargs:
+            self.MODEL_COLOR = kwargs.pop('model_color')
+        else:
+            self.MODEL_COLOR = "grey"
+        
         if 'width' not in kwargs:
             self.WIDTH = len(self.MODEL_TEXT) + 2
-            self.configure(width=self.WIDTH) 
         else:
-            self.WIDTH = kwargs['width']        
-        self.configure(foreground=self.MODEL_COLOR)
-        self.delete(0, tk.END)
-        self.insert(0, self.MODEL_TEXT)
+            self.WIDTH = kwargs['width']
+        
+        super().configure(foreground=self.MODEL_COLOR)
+        super().delete(0, tk.END)
+        super().insert(0, self.MODEL_TEXT)
 
     @property
     def timedelta(self):
