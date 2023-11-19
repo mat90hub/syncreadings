@@ -22,28 +22,28 @@ def strptimedelta(time_delta_str: str) -> timedelta:
                 case 's':
                     seconds = float(number)
                 case _:
-                    raise Exception("time delta not recognized")
+                    raise Exception('time delta not recognized')
         return timedelta(hours=hours, minutes=minutes, seconds=seconds)
     else:
         return None  # No match found
 
 def strftimedelta(time_delta: timedelta) -> str:
-    '''Format a time delta into a string.'''
-    result = ""
+    """Format a time delta into a string."""
+    result = ''
     _TOT_SEC = time_delta.total_seconds()
     if _TOT_SEC >= 3600:
         _HOURS = int(_TOT_SEC // 3600)
-        result += f"{_HOURS}h "
+        result += f'{_HOURS}h '
         _TOT_SEC -= _HOURS * 3600
     if _TOT_SEC >= 60:
         _MINUTES = int(_TOT_SEC // 60)
-        result += f"{_MINUTES}min "
+        result += f'{_MINUTES}min '
         _TOT_SEC -= _MINUTES * 60
     if _TOT_SEC > 0:
         if _TOT_SEC == int(_TOT_SEC):
-            result += f"{int(_TOT_SEC)}s"
+            result += f'{int(_TOT_SEC)}s'
         else:
-            result += f"{round(_TOT_SEC, 3)}s"
+            result += f'{round(_TOT_SEC, 3)}s'
     result = result.rstrip()
     return result
     
@@ -56,17 +56,15 @@ class EntryTimedelta(EntryWithModel):
         if 'model' in kwargs:
             self.MODEL_TEXT = kwargs.pop('model')
         else:
-            self.MODEL_TEXT = "00h 00min 00.000s"
+            self.MODEL_TEXT = '00h 00min 00.000s'
         if 'model_color' in kwargs:
             self.MODEL_COLOR = kwargs.pop('model_color')
         else:
-            self.MODEL_COLOR = "grey"
-        
+            self.MODEL_COLOR = 'grey'
         if 'width' not in kwargs:
             self.WIDTH = len(self.MODEL_TEXT) + 2
         else:
             self.WIDTH = kwargs['width']
-        
         super().configure(foreground=self.MODEL_COLOR)
         super().delete(0, tk.END)
         super().insert(0, self.MODEL_TEXT)
@@ -76,16 +74,16 @@ class EntryTimedelta(EntryWithModel):
         return strptimedelta(self.get())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     
     def test_values_and_units():
         root = tk.Tk()
-        root.title("Test value and unit.")
+        root.title('Test value and unit.')
         frame = tk.Frame(root,width=26)
         frame.pack(fill=tk.BOTH, expand=True)
 
         entry_values = EntryWithModel(frame, 
-                                      model="00h 00min 00.0s", 
+                                      model='00h 00min 00.0s', 
                                       width=20)
         entry_values.pack(side=tk.LEFT, padx=40, pady=20)
 
@@ -118,21 +116,21 @@ if __name__ == "__main__":
 
     def test_EntryTimedelta():
         root = tk.Tk()
-        root.title("Test entry of a time delta.")
+        root.title('Test entry of a time delta.')
         frame = tk.Frame(root,width=25, height=6)
         frame.pack()
 
         entryTimedelta = EntryTimedelta(frame)
         entryTimedelta.pack(side=tk.LEFT, padx=20, pady=20)
 
-        frame2 = tk.Frame(root, width=frame.cget("width"))
+        frame2 = tk.Frame(root, width=frame.cget('width'))
         frame2.pack(expand=True, fill=tk.BOTH)
 
-        tk.Label(frame2, text='result:', width=18, anchor="e").pack(side=tk.LEFT, padx=10, pady=20)
-        result = tk.Label(frame2, width=entryTimedelta.cget("width"), anchor="w", justify="left")
+        tk.Label(frame2, text='result:', width=18, anchor='e').pack(side=tk.LEFT, padx=10, pady=20)
+        result = tk.Label(frame2, width=entryTimedelta.cget('width'), anchor='w', justify='left')
         result.pack(side=tk.LEFT, padx=10, pady=20)
 
-        frm_btn = tk.Frame(root, width=frame.cget("width"))
+        frm_btn = tk.Frame(root, width=frame.cget('width'))
         frm_btn.pack(side=tk.BOTTOM)
 
         btn_td = tk.Button(frm_btn, text='test timedelta', 
@@ -144,15 +142,15 @@ if __name__ == "__main__":
 
     
     def default_case():
-        print("Case not defined...")
+        print('Case not defined...')
 
     # the possible test cases
     tests_cases = {
-        "test extraction of values and units": test_values_and_units,
-        "test entry of a time delta" : test_EntryTimedelta,
+        'test extraction of values and units': test_values_and_units,
+        'test entry of a time delta' : test_EntryTimedelta,
     }
 
     # test_to_do = "test extraction of values and units"
-    test_to_do = "test entry of a time delta"
+    test_to_do = 'test entry of a time delta'
 
     tests_cases.get(test_to_do, default_case)()

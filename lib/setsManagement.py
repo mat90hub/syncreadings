@@ -11,7 +11,7 @@ import re
 
 from tkinter import messagebox
 
-'''
+"""
 The default choices for synchronizing the data sets
 - start, end: max, min or a date-time as a string ;
 - step: min, max, lcm, gcd, or a sting expressing a duration 
@@ -36,42 +36,44 @@ ones. A general interpolation will be done.
 >>  end=min
 >> which means no need of interpolation and exact values
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-'''
+"""
 
 default_choices = {
-    "start": "max",
-    "end": "min",
-    "step": "gcd",
-    "datetime_format": "%Y-%m-%d %H:%M:%S"
+    'start': 'max',
+    'end': 'min',
+    'step': 'gcd',
+    'datetime_format': '%Y-%m-%d %H:%M:%S'
 }
 def get_default_choices() -> dict:
     return default_choices
 
 
 def read_measures(filename: str) -> dict:
-    '''
+    """
     Read a filename containing sets of data one below each other
     and return a list measures.
 
     The result is structured as following:
     {
-        "meas01": [(date, value), (date, value) ...],
-        "meas02": [(date, value), (date, value) ...],
+        'meas01': [(date, value), (date, value) ...],
+        'meas02': [(date, value), (date, value) ...],
         ...
     }
-    '''
+    """
     with open(filename, 'r') as file:
         lines = file.readlines()
-    
-        measures = defaultdict(list)
-        # see : https://docs.python.org/fr/3/library/collections.html#collections.defaultdict
-        # Usually, a Python dictionary throws a KeyError if you try to get an item with a key 
-        # that is not currently in the dictionary. The defaultdict in contrast will simply 
-        # create any items that you try to access (provided of course they do not exist yet).
 
-        name = "xxx"
+        measures = defaultdict(list)
+        # see : https://docs.python.org/fr/3/library/collections.html
+        # Usually, a Python dictionary throws a KeyError if you try
+        # to get an item with a key that is not currently in the
+        # dictionary. The defaultdict in contrast will simply create
+        # any items that you try to access (provided of course they
+        # do not exist yet).
+
+        name = 'xxx'
         date_format_checked = False
-        datetime_format = "%Y-%m-%d %H:%M:%S"
+        datetime_format = '%Y-%m-%d %H:%M:%S'
         for line in lines:
             if ',' in line:
                 date_str, value_str = line.strip().split(',')
@@ -83,30 +85,30 @@ def read_measures(filename: str) -> dict:
                     value = float(value_str)
                 except ValueError as err:
                     messagebox.showerror(
-                        title="ValueError with File", 
+                        title='ValueError with File',
                         message="Script and data file format don't match."
                     )
-                measures[name].append((date,value))
+                measures[name].append((date, value))
             else:
                 name = line.strip()
                 # if ms for one set, applies for all
-                if (datetime_format[-1] != "f"):
+                if (datetime_format[-1] != 'f'):
                     date_format_checked = False
         return measures
 
 def check_constant_time_step(data:dict, nb_tests=3) -> bool:
-    '''
+    """
     Check if the time steps between measure is constant.
-    The complete check is too long for large sets, so we do sampling test instead.
-    '''
+    The complete check is too long for large sets,
+    so we do sampling test instead.
+    """
     for k in data.keys():
-
         _NUMB_MEAS = len(data[k])
         if _NUMB_MEAS <= 1:
-            raise NameError(f"List {data[k]} has only 1 or less element!")
+            raise NameError(f'List {data[k]} has only 1 or less element!')
 
         _STEP = data[k][1][0] - data[k][0][0]           # first step
-        
+
         if (data[k][-1][0] - data[k][-2][0] != _STEP):  # compare with last step
             return False
 
@@ -114,83 +116,83 @@ def check_constant_time_step(data:dict, nb_tests=3) -> bool:
             _NUM = random.randint(1, _NUMB_MEAS-2)
             if (data[k][_NUM+1][0] - data[k][_NUM][0] != _STEP):
                 return False
-            
     return True
 
 def check_datetime_format(date_str:str) -> str:
-    '''
-    Analyze the sets of measures and determine the 
+    """
+    Analyze the sets of measures and determine the
     exact format of the datetime
-        "datetime_format": "%Y-%m-%d %H:%M:%S"    (default)
-        "datetime_format": "%Y-%m-%d %H:%M:%S.%f" (with milliseconds)                
-    '''
+        'datetime_format': '%Y-%m-%d %H:%M:%S'    (default)
+        'datetime_format': '%Y-%m-%d %H:%M:%S.%f' (with milliseconds)
+    """
     pattern = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}'
     if bool(re.search(pattern, date_str)):
-        result = "%Y-%m-%d %H:%M:%S.%f"
-        default_choices["datetime_format"] = result
+        result = '%Y-%m-%d %H:%M:%S.%f'
+        default_choices['datetime_format'] = result
         return result
-    
+
     pattern = r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
     if bool(re.search(pattern, date_str)):
-        result = "%Y-%m-%d %H:%M:%S"
+        result = '%Y-%m-%d %H:%M:%S'
         return result
-    
+
     pattern = r'\d{2}:\d{2}:\d{2}\.\d{3}'
     if bool(re.search(pattern, date_str)):
-        result = "%H:%M:%S.%f"
-        default_choices["datetime_format"] = result
+        result = '%H:%M:%S.%f'
+        default_choices['datetime_format'] = result
         return result
-    
+
     pattern = r'\d{2}:\d{2}:\d{2}'
     if bool(re.search(pattern, date_str)):
-        result = "%H:%M:%S"
+        result = '%H:%M:%S'
         return result
 
 def sets_starts_ends_steps(data: dict) -> dict:
-    '''
+    """
     Analyze the characteristics of sets of measures:
     - the min, max starting date-time
     - the min, max ending date-time
     - the time steps with their gcd and lcm
-    '''
+    """
     result = {}
     _starts = [data[k][0][0] for k in data.keys()]
-    result["starts"] = _starts
-    result["start_earliest"] = min(_starts)
-    result["start_latest"] = max(_starts)
+    result['starts'] = _starts
+    result['start_earliest'] = min(_starts)
+    result['start_latest'] = max(_starts)
     _ends = [data[k][-1][0] for k in data.keys()]
-    result["ends"] = _ends
-    result["end_earliest"] = min(_ends)
-    result["end_latest"] = max(_ends)
+    result['ends'] = _ends
+    result['end_earliest'] = min(_ends)
+    result['end_latest'] = max(_ends)
 
     _time_steps = [(data[k][1][0] - data[k][0][0]) for k in data.keys()]
-    result["time_step"] = _time_steps
-    result["time_step_shortest"] = min(_time_steps)
-    result["time_step_longest"] = max(_time_steps)
+    result['time_step'] = _time_steps
+    result['time_step_shortest'] = min(_time_steps)
+    result['time_step_longest'] = max(_time_steps)
 
-    if default_choices["datetime_format"][-1] == 'f':
+    if default_choices['datetime_format'][-1] == 'f':
         # datetime used milliseconds, lcm and gcd are calculated with ms
-        _time_steps_ms = [int(step.total_seconds()*1000) for step in _time_steps]        
-        result["time_step_lcm"] = timedelta(milliseconds= lcm(*_time_steps_ms))        
-        result["time_step_gcd"] = timedelta(milliseconds= gcd(*_time_steps_ms))
+        _time_steps_ms = [int(step.total_seconds()*1000)
+                          for step in _time_steps]
+        result['time_step_lcm'] = timedelta(milliseconds= lcm(*_time_steps_ms))
+        result['time_step_gcd'] = timedelta(milliseconds= gcd(*_time_steps_ms))
     else:
         _time_steps = [int(step.total_seconds()) for step in _time_steps]
-        result["time_step_lcm"] = timedelta(seconds=lcm(*_time_steps))
-        result["time_step_gcd"] = timedelta(seconds= gcd(*_time_steps))
+        result['time_step_lcm'] = timedelta(seconds=lcm(*_time_steps))
+        result['time_step_gcd'] = timedelta(seconds= gcd(*_time_steps))
 
     return result
 
 def report_on_sets(data: dict) -> str:
-    '''
+    """
     Give chosen characteristics in a string.
     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     In the first version, we just declare choice made.
     There is no possibility given to change it.
     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-    '''
+    """
     _RES = sets_starts_ends_steps(data)
 
-    time_format = default_choices["datetime_format"]
+    time_format = default_choices['datetime_format']
     if (time_format[-1] == 'f'):
         with_ms = True
     else:
@@ -198,111 +200,111 @@ def report_on_sets(data: dict) -> str:
 
     _LLIST = []
     if with_ms:
-        _LLIST.append(["earliest start is", 
+        _LLIST.append(['earliest start is',
                        _RES['start_earliest'].strftime(time_format)[0:-3]])
-        _LLIST.append(["latest start is", 
+        _LLIST.append(['latest start is',
                        _RES['start_latest'].strftime(time_format)[0:-3]])
-        _LLIST.append(["retained start is", 
+        _LLIST.append(['retained start is',
                        _RES['start_latest'].strftime(time_format)[0:-3]])
-        _LLIST.append(["",""])
+        _LLIST.append(['',''])
 
-        _LLIST.append(["earliest end is", 
+        _LLIST.append(['earliest end is',
                        _RES['end_earliest'].strftime(time_format)[0:-3]])
-        _LLIST.append(["latest end is", 
+        _LLIST.append(['latest end is',
                        _RES['end_latest'].strftime(time_format)[0:-3]])
-        _LLIST.append(["retained end is", 
+        _LLIST.append(['retained end is',
                        _RES['end_earliest'].strftime(time_format)[0:-3]])
-        _LLIST.append(["",""])
+        _LLIST.append(['',''])
     else:
-        _LLIST.append(["earliest start is", 
+        _LLIST.append(['earliest start is',
                        _RES['start_earliest'].strftime(time_format)])
-        _LLIST.append(["latest start is", 
+        _LLIST.append(['latest start is',
                        _RES['start_latest'].strftime(time_format)])
-        _LLIST.append(["retained start is", 
+        _LLIST.append(['retained start is',
                        _RES['start_latest'].strftime(time_format)])
-        _LLIST.append(["",""])
+        _LLIST.append(['',''])
 
-        _LLIST.append(["earliest end is", 
+        _LLIST.append(['earliest end is',
                        _RES['end_earliest'].strftime(time_format)])
-        _LLIST.append(["latest end is", 
+        _LLIST.append(['latest end is',
                        _RES['end_latest'].strftime(time_format)])
-        _LLIST.append(["retained end is", 
+        _LLIST.append(['retained end is',
                        _RES['end_earliest'].strftime(time_format)])
-        _LLIST.append(["",""])
-        
-    steps_list = ""
+        _LLIST.append(['',''])
+
+    steps_list = ''
     unit = 's'
-    for step in _RES["time_step"]:
-        steps_list += f"{step.total_seconds()}{unit}, "
+    for step in _RES['time_step']:
+        steps_list += f'{step.total_seconds()}{unit}, '
     steps_list = steps_list.strip(', ')
-    _LLIST.append(["time steps are", steps_list])
-    _LLIST.append(["time steps lcm is", f"{_RES['time_step_lcm'].total_seconds()}{unit}"])
-    _LLIST.append(["time steps gcd is", f"{_RES['time_step_gcd'].total_seconds()}{unit}"])
+    _LLIST.append(['time steps are', steps_list])
+    _LLIST.append(['time steps lcm is', f"{_RES['time_step_lcm'].total_seconds()}{unit}"])
+    _LLIST.append(['time steps gcd is', f"{_RES['time_step_gcd'].total_seconds()}{unit}"])
 
     return tabulate(_LLIST)
 
 def choose_start_end_step(data: dict, synchro_choice=default_choices) -> list:
-    '''
+    """
     From sets of data and settings determine start, end and step.
-    '''
+    """
     # determine start / end / step according to settings
     char = sets_starts_ends_steps(data)
     start_with_empties = False
     end_with_empties = False
 
-    match synchro_choice["start"]:
-        case "min":
-            _start = char["time_step"]
+    match synchro_choice['start']:
+        case 'min':
+            _start = char['time_step']
             start_with_empties = True
-        case "max":
-            _start = char["start_latest"]
+        case 'max':
+            _start = char['start_latest']
         case _:
             try:
-                _start = datetime.strptime(char["start"], 
-                                           synchro_choice["datetime_format"])
-                if (_start < char["start_latest"]):
+                _start = datetime.strptime(char['start'], 
+                                           synchro_choice['datetime_format'])
+                if (_start < char['start_latest']):
                     start_with_empties = True
             except ValueError:
                 messagebox.showerror(
-                        title="Date format error",
-                        message=f"Start date {_start} not matching chosen format settings.")
+                        title='Date format error',
+                        message=f'Start date {_start} not matching chosen format settings.')
 
-    match synchro_choice["end"]:
-        case "min":
-            _end = char["end_earliest"]
-        case "max":
-            _end = char["end_latest"]
+    match synchro_choice['end']:
+        case 'min':
+            _end = char['end_earliest']
+        case 'max':
+            _end = char['end_latest']
             end_with_empties = True
         case _:
             try:
-                _end = datetime.strptime(char["date"], 
-                                         synchro_choice["datetime_format"])
-                if (_end > char["end_soonest"]):
+                _end = datetime.strptime(char['date'], 
+                                         synchro_choice['datetime_format'])
+                if (_end > char['end_soonest']):
                     end_with_empties = False
             except ValueError:
                 messagebox.showerror(
-                        title="Date format error", 
-                        message=f"End date {_end} not matching chosen format settings.")
+                        title='Date format error', 
+                        message=f'End date {_end} not matching chosen format settings.')
     
-    match synchro_choice["step"]:
-        case "lcm":
-            _step = char["time_step_lcm"]
-        case "gcd":
-            _step = char["time_step_gcd"]            
-        case "max":
-            _step = char["time_step_longest"]
-        case "min":
-            _step = char["time_step_shortest"]
+    match synchro_choice['step']:
+        case 'lcm':
+            _step = char['time_step_lcm']
+        case 'gcd':
+            _step = char['time_step_gcd']            
+        case 'max':
+            _step = char['time_step_longest']
+        case 'min':
+            _step = char['time_step_shortest']
         case _:
-            # the synchro_choice["step"] should give the exact chosen step
-            _step = pd.Timedelta(synchro_choice["step"])
+            # the synchro_choice['step'] should give the exact chosen step
+            _step = pd.Timedelta(synchro_choice['step'])
             
     # stopping for not developed options
     if (start_with_empties):
-        messagebox.showinfo("Development pending", "For this version, all sets shall have beginning values.")
+        messagebox.showinfo('Development pending', 'For this version, all sets shall have beginning values.')
         return {}
     if (end_with_empties):
-        messagebox.showinfo("Development pending", "For this version, all sets shall have ending values.")
+        messagebox.showinfo('Development pending', 'For this version, all sets shall have ending values.')
         return {}
 
     return (_start,  _end, _step)
@@ -388,19 +390,18 @@ def synchronized_sets(data: dict,
     return df
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     filename = './dat/data.csv'
     data_set = read_measures(filename)
 
     # Recover characteristics of the sets
     char = sets_starts_ends_steps(data_set)
-    result = ""
+    result = ''
     for k in char.keys():
-        result += f"{k}: {char[k]}\n"
-    print(f"\n{result}\n")
-
+        result += f'{k}: {char[k]}\n'
+    print(f'\n{result}\n')
 
     df = synchronized_sets(data_set)
-    
+
     print(df.head(5))

@@ -1,9 +1,9 @@
 {
-    "python.pythonPath": "${workspaceFolder}/.venv/bin/python3",
+    "python.pythonPath"        : "${workspaceFolder}/.venv/bin/python3",
     "esbonio.server.pythonPath": "${workspaceFolder}/.venv/bin/python3",
-    "python.poetryPath": "poetry",
-    "python.venvPath": ".venv",
-    "esbonio.sphinx.buildDir" : "${workspaceFolder}/build/html",
-    "esbonio.sphinx.confDir"  : "${workspaceFolder}/doc",
-    "esbonio.sphinx.srcDir"   : "${workspaceFolder}/doc"
+    "python.poetryPath"        : "poetry",
+    "python.venvPath"          : "${workspaceFolder}/.venv",
+    "esbonio.sphinx.buildDir"  : "${workspaceFolder}/doc/_build/html",
+    "esbonio.sphinx.confDir"   : "${workspaceFolder}/doc",
+    "esbonio.sphinx.srcDir"    : "${workspaceFolder}/doc"
 }
