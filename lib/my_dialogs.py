@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import font
+from tkinter import ttk, font
 from tkinter.filedialog import asksaveasfilename
 from datetime import timedelta, datetime
 
@@ -25,7 +25,7 @@ def text_message(root, text: str, title='information',
     _TXT.insert(tk.END, text)
     _TXT.config(state=tk.DISABLED)
 
-    _BTN = tk.Button(_WIN, text='Ok', command=lambda: _WIN.destroy())
+    _BTN = ttk.Button(_WIN, text='Ok', command=lambda: _WIN.destroy())
     _BTN.pack()
 
 
@@ -38,7 +38,7 @@ def about_window(root, text: str, title='About',
     _TXT = tk.Text(_WIN, background=background, width=width, height=height)
     _TXT.insert(tk.END, text)
     _TXT.grid(row=0, column=0, sticky='nswe')
-    _BTN = tk.Button(_WIN, text='Ok', command=lambda: _WIN.destroy())
+    _BTN = ttk.Button(_WIN, text='Ok', command=lambda: _WIN.destroy())
     _BTN.grid(row=1, column=0)
 
 
@@ -54,7 +54,7 @@ def user_manual(root, html_file: str, title='User instructions'):
     _HTML.pack(padx=5, pady=5, fill='both', expand=True)
     _HTML.grid_columnconfigure(0, weight=1)
     _HTML.grid_rowconfigure(0, weight=1)
-    _BTN = tk.Button(_WIN, text='Close', command=lambda: _WIN.destroy())
+    _BTN = ttk.Button(_WIN, text='Close', command=lambda: _WIN.destroy())
     # _BTN.grid(row=1, column=0)
     _BTN.pack()
 
@@ -64,10 +64,10 @@ def display_list(root, datalist: list, title: str='Data List'):
     _WIN = tk.Toplevel(root)
     _WIN.title(title)
 
-    _SCROLLBAR = tk.Scrollbar(_WIN, orient=tk.VERTICAL, width=40)
+    _SCROLLBAR = ttk.Scrollbar(_WIN, orient=tk.VERTICAL)
     _LIST = tk.Listbox(
         _WIN,
-        width=50,
+        width=5,
         selectmode=tk.SINGLE,
         yscrollcommand=_SCROLLBAR.set
     )
@@ -80,7 +80,7 @@ def display_list(root, datalist: list, title: str='Data List'):
     _SCROLLBAR.config(command=_LIST.yview)
     _SCROLLBAR.grid(row=0, column=1, sticky='ns')
 
-    _BTN = tk.Button(_WIN, text='close', command=lambda: _WIN.destroy())
+    _BTN = ttk.Button(_WIN, text='close', command=lambda: _WIN.destroy())
     _BTN.grid(row=1, column=0, stick='s')
 
     _WIN.rowconfigure(0, weight=1)
@@ -257,6 +257,8 @@ if __name__ == '__main__':
     default_font.configure(size=fontsize)
     root.option_add('*Font', default_font)
 
+    style = ttk.Style()
+    style.configure('Vertical.TScrollbar', arrowsize=80)
 
     frame = tk.Frame(root, padx=20, pady=20, background='lightblue')
     frame.pack(fill=tk.BOTH, expand=True)
