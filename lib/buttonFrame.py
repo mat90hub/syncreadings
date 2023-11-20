@@ -6,34 +6,16 @@ class ButtonFrame():
     event_handler = None
 
     def __init__(self, container, **kwargs):
-        if 'row' in kwargs:        
-            self.ROW = kwargs.pop('row')
-        else:
-            self.ROW = 0
-        if 'plus_style' in kwargs:
-            self.PLUS_STYLE = kwargs.pop('plus_style')
-        else:
-            self.PLUS_STYLE = 'TButton'
-        if 'minus_style' in kwargs:
-            self.MINUS_STYLE = kwargs.pop('minus_style')
-        else:
-            self.MINUS_STYLE = 'TButton'
-        if 'frame1_style' in kwargs:
-            self.FRAME1_STYLE = kwargs.pop('frame1_style')
-        else:
-            self.FRAME1_STYLE ='TFrame'
-        if 'frame2_style' in kwargs:
-            self.FRAME2_STYLE = kwargs.pop('frame2_style')
-        else:
-            self.FRAME2_STYLE ='TFrame'
+        self.ROW = kwargs.pop('row', 0)
+        self.PLUS_STYLE = kwargs.pop('plus_style', 'TButton')
+        self.MINUS_STYLE = kwargs.pop('minus_style', 'TButton')
+        self.FRAME1_STYLE = kwargs.pop('frame1_style', 'TFrame')
+        self.FRAME2_STYLE = kwargs.pop('frame2_style', 'TFrame')
         self.CONTAINER = container        
-        self.BUTTON = ttk.Button(container, text='+', 
-                                 style=self.PLUS_STYLE,
+        self.BUTTON = ttk.Button(container, text='+', style=self.PLUS_STYLE,
                                  command=self.toggle)
         self.BUTTON.grid(row=self.ROW, column=0, sticky='n', padx=(20,10), pady=10)
-
-        self.FRAME = ttk.Frame(container, padding=10,
-                               style=self.FRAME1_STYLE)
+        self.FRAME = ttk.Frame(container, padding=10, style=self.FRAME1_STYLE)
         self.FRAME.grid(row=self.ROW, column=1, sticky='news', padx=(10,20), pady=10)
         self.update_color()
         self.FRAME.grid_remove() # initially hidden 
