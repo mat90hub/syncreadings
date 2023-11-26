@@ -120,16 +120,16 @@ if __name__ == "__main__":
     
     status_bar = ttk.Frame(root, height=20)
     status_bar.grid(row=1, column=0, sticky='nesw')
-    status_lbl = ttk.Label(status_bar, text="status:")
-    status_lbl.grid(row=0, column=0, sticky="new", padx=10, pady=10)
+    status_lbl = ttk.Label(status_bar, text='status: ')
+    status_lbl.grid(row=0, column=0, sticky='new', padx=10, pady=10)
 
     def status_update(event):
-        if event == "Line added":
-            status_lbl.configure(text="status: Line added")
-        elif event == "Line removed":
-            status_lbl.configure(text="status: Line removed")
+        if event == 'Line added':
+            status_lbl.configure(text='status: Line added')
+        elif event == 'Line removed':
+            status_lbl.configure(text='status: Line removed')
         else:
-            status_lbl.configure(text="status:")
+            status_lbl.configure(text='status: ')
 
     button.set_event_handler(status_update)
 

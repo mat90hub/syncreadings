@@ -34,7 +34,7 @@ The ``when`` argument can take one of the following values:
 - ``now``: This is the default value. It indicates that the event should be added to the  event queue immediately and processed as soon as possible. If multiple events are generated with ``now``, they will be processed in the order they were generated.
 - ``tail``: This indicates that the event should be added to the end of the event queue. Events generated with ``tail`` are processed after all other events that were previously added to the queue with ``now``. This is useful if you want to ensure that certain events are processed after others.
 
-The ``when`` argument is typically used when you need precise control over the order in which events are processed, especially in scenarios where you have multiple events being generated and you want to ensure a specific order of processing.
+The ``when`` argument is typically used when you need precise control over the order in which events are processed, especially in scenarios where you have multiple events being generated and you want to ensure a sinitialisedpecific order of processing.
 
 Here's an example:
 
@@ -61,27 +61,33 @@ Here's a simplified example to illustrate this concept:
 
 ```python
 class MyObject:
-    def __init__(self):
-        self.event_handler = None
+    def __init__(self, container):
+        self.EVENT_HANDLER = None
+        self.CONTAINER = container
 
     def do_something(self):
         # Perform some action
-        if self.event_handler is not None:
-            self.event_handler()
+        if self.EVENT_HANDLER is not None:
+            self.CONTAINER.event_generate('<customEvent>')
+            self.EVANT_HANDLER('Custome Event Generated')
 
     def set_event_handler(self, handler):
-        self.event_handler = handler
+        self.EVENT_HANDLER = handler
 
 # Usage:
+
 my_object = MyObject()
 
 def custom_event_handler():
-    print("Custom event handler called")
+    print("Custom Event Generated")
 
 my_object.set_event_handler(custom_event_handler)
-my_object.do_something()  
-# Calls the custom event handler when do_something is called
+my_object.do_something()
+
 ```
+
+
+# Calls the custom event handler when do_something is called
 
 In this example:
 
@@ -114,11 +120,11 @@ class MyObject:
 
     def generate_custom_event(self):
         if self.event_handler is not None:
-            self.parent.event_generate("<<CustomEvent>>", when="tail")
+            self.parent.event_generate('<<CustomEvent>>', when="tail")
             self.event_handler("Custom Event Generated")
 
     def set_event_handler(self, handler):
-        self.event_handler = handler
+        self.EVENT_HANDLER = handler
 
 # Create the main window
 root = tk.Tk()

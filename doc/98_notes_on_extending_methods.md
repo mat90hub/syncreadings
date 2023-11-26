@@ -4,7 +4,7 @@ When building a class as a descendant of an existing class (or widget), one will
 
 The recommended way to do it is as below:
 
-- searching the new features in the keys of ``kwargs`` and retrieve them with ``pop`` method. This allow to be sure, the initialisation with this parameters won't be done twice.
+- searching the new features in the keys of ``kwargs`` and retrieve them with ``pop`` method, which second parameter is the default value. The ``pop`` command assures these parameters won't be used twice in the initialisation process.
 - initialize the rest of the parameters at the end with the method ``super().__init__`` which is launching the initialisation of the ancestor
 - perform the other action
 
@@ -19,15 +19,8 @@ class EntryWithModel(tk.Entry):
     def __init__(self, container, **kwargs):
         # recover all particular new parameters
         # from kwargs (avoid mixing)
-        if 'model' in kwargs:
-            self.MODEL_TEXT = kwargs.pop('model')
-        else:
-            # the right place for the defaut value
-            self.MODEL_TEXT = " sin(x)  "
-  
-	# ... only some initialisations shown here ...
-        if 'min' in kwargs:
-            self.MIN = kwargs.pop('min')
+        self.MODEL_TEXT = kwargs.pop('model', ' sin(x) ')
+	self.MIN = kwargs.pop('min')
 
 	# the standard parameters, that may be absent
         if 'width' not in kwargs:
