@@ -1,4 +1,4 @@
-import tkinter as tk
+from tkinter import Tk, ttk, font, END
 from entryWithModel import EntryWithModel
 from datetime import timedelta
 import re
@@ -49,26 +49,7 @@ def strftimedelta(time_delta: timedelta) -> str:
     
 
 class EntryTimedelta(EntryWithModel):
-    def __init__(self, master, **kwargs):
-
-        super().__init__(master, **kwargs)
-
-        if 'model' in kwargs:
-            self.MODEL_TEXT = kwargs.pop('model')
-        else:
-            self.MODEL_TEXT = '00h 00min 00.000s'
-        if 'model_color' in kwargs:
-            self.MODEL_COLOR = kwargs.pop('model_color')
-        else:
-            self.MODEL_COLOR = 'grey'
-        if 'width' not in kwargs:
-            self.WIDTH = len(self.MODEL_TEXT) + 2
-        else:
-            self.WIDTH = kwargs['width']
-        super().configure(foreground=self.MODEL_COLOR)
-        super().delete(0, tk.END)
-        super().insert(0, self.MODEL_TEXT)
-
+        
     @property
     def timedelta(self):
         return strptimedelta(self.get())
@@ -76,25 +57,44 @@ class EntryTimedelta(EntryWithModel):
 
 if __name__ == '__main__':
     
+    root = Tk()
+    root.geometry('1200x500')
+    root.attributes('-topmost', 1)  # keep window on top, while checking the code
+    root.columnconfigure(0, weight=1)
+    root.rowconfigure(0, weight=1)
+    root.rowconfigure(1, weight=0)
+    
+    style = ttk.Style()
+    style.configure('button.TFrame', background='lightskyblue4')
+    style.configure('black.TEntry', fieldbackground='gray99', foreground='black')
+    style.configure('gray.TEntry', fieldbackground='gray99', foreground='gray60')
+    style.configure('red.TEntry', fieldbackground='yellow', foreground='red')
+
+    # controlling the size of the default font
+    default_font = font.nametofont('TkDefaultFont')
+    default_font.configure(size=18)
+    root.option_add('*Font', default_font)
+
+    frame = ttk.Frame(root)
+    frame.grid(row=0, column=0, sticky='nsew')
+    frame.rowconfigure(0, weight=0)
+    frame.columnconfigure(0, weight=0)
+    frame.columnconfigure(1, weight=1)
+
+
     def test_values_and_units():
-        root = tk.Tk()
-        root.title('Test value and unit.')
-        frame = tk.Frame(root,width=26)
-        frame.pack(fill=tk.BOTH, expand=True)
+        """First test"""        
+        root.title("test values and units.")
 
-        entry_values = EntryWithModel(frame, 
-                                      model='00h 00min 00.0s', 
-                                      width=20)
-        entry_values.pack(side=tk.LEFT, padx=40, pady=20)
-
-        frame2 = tk.Frame(root, width = 26)
-        frame2.pack(expand=True, fill=tk.BOTH)
-
-        tk.Label(frame2, 
-                 text='total in seconds:', 
-                 width=18).pack(side=tk.LEFT, padx=10, pady=20)
-        total_s = tk.Label(frame2, width=20)
-        total_s.pack(side=tk.LEFT, padx=20, pady=20)
+        entry_values = EntryWithModel(frame, model='00h 00min 00.0s', width=20,
+                                      style='black.TEntry', 
+                                      style_model='gray.TEntry',
+                                      style_error='red.TEntry')
+        entry_values.grid(row=0, column=0, columnspan=2, padx=40, pady=20, sticky='we')
+        
+        ttk.Label(frame, text='total in seconds:', justify='left', anchor='w').grid(row=1, column=0, padx=(20,10), pady=20)
+        total_s = ttk.Label(frame)
+        total_s.grid(row=1, column=1, padx=(10,20), pady=20,sticky='we')
 
         def display_seconds():
             """Detailed step to help debug."""
@@ -104,40 +104,44 @@ if __name__ == '__main__':
             _seconds = _timedelta.total_seconds()
             total_s.configure(text = str(_seconds))
 
-        frame_btn = tk.Frame(root)
-        frame_btn.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
-        tk.Button(frame_btn, 
-                  text='analyse', 
-                  command=display_seconds).pack(side=tk.LEFT, padx=40, pady=40)
-        tk.Button(frame_btn, 
-                  text='close', 
-                  command=lambda: root.destroy()).pack(side=tk.RIGHT, padx=40, pady=40)
+        frame_btn = ttk.Frame(root, style='button.TFrame')
+        frame_btn.grid(row=1, column=0, sticky='ew')
+        frame_btn.rowconfigure(0, weight=1)
+        frame_btn.columnconfigure(0, weight=1)
+        frame_btn.columnconfigure(1, weight=1)
+
+        ttk.Button(frame_btn, text='analyse', 
+                   command=display_seconds).grid(row=0, column=0, padx=40, pady=40)
+        ttk.Button(frame_btn, text='close', 
+                   command=lambda: root.destroy()).grid(row=0, column=1, padx=40, pady=40)
+        
         root.mainloop()
 
     def test_EntryTimedelta():
-        root = tk.Tk()
-        root.title('Test entry of a time delta.')
-        frame = tk.Frame(root,width=25, height=6)
-        frame.pack()
+        """Second test"""                
+        root.title("test EntryTimedelta.")
 
-        entryTimedelta = EntryTimedelta(frame)
-        entryTimedelta.pack(side=tk.LEFT, padx=20, pady=20)
+        entryTimedelta = EntryTimedelta(frame, model='00h 00min 00.0s', width=20,
+                                        style='black.TEntry', 
+                                        style_model='gray.TEntry',
+                                        style_error='red.TEntry')
+        entryTimedelta.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky='we')
 
-        frame2 = tk.Frame(root, width=frame.cget('width'))
-        frame2.pack(expand=True, fill=tk.BOTH)
+        ttk.Label(frame, text='result:', justify='left', anchor='e').grid(row=1, column=0, padx=(20,10), pady=20)
+        result = ttk.Label(frame, anchor='w', justify='left')
+        result.grid(row=1, column=1, padx=(10,20), pady=20)
 
-        tk.Label(frame2, text='result:', width=18, anchor='e').pack(side=tk.LEFT, padx=10, pady=20)
-        result = tk.Label(frame2, width=entryTimedelta.cget('width'), anchor='w', justify='left')
-        result.pack(side=tk.LEFT, padx=10, pady=20)
+        frame_btn = ttk.Frame(root, style='button.TFrame')
+        frame_btn.grid(row=1, column=0, sticky='ew')
+        frame_btn.rowconfigure(0, weight=0)
+        frame_btn.columnconfigure(0, weight=1)
+        frame_btn.columnconfigure(1, weight=1)
 
-        frm_btn = tk.Frame(root, width=frame.cget('width'))
-        frm_btn.pack(side=tk.BOTTOM)
-
-        btn_td = tk.Button(frm_btn, text='test timedelta', 
-                           command=lambda: result.configure(text=entryTimedelta.timedelta))
-        btn_td.pack(side=tk.LEFT, padx=20, pady=20)
-        btn_ok = tk.Button(frm_btn, text='close', command=lambda: root.destroy())
-        btn_ok.pack(side=tk.RIGHT, padx=20, pady=20)
+        btn_td = ttk.Button(frame_btn, text='test timedelta', 
+                            command=lambda: result.configure(text=entryTimedelta.timedelta))
+        btn_td.grid(row=0, column=0, padx=20, pady=20)
+        btn_ok = ttk.Button(frame_btn, text='close', command=lambda: root.destroy())
+        btn_ok.grid(row=0, column=1, padx=20, pady=20)
         root.mainloop()
 
     

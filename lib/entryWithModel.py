@@ -9,7 +9,7 @@ def isfloat(num):
 
 class EntryWithModel(ttk.Entry):
     """Entry widget with a model."""
-    def __init__(self, master, **kwargs):
+    def __init__(self, container, **kwargs):
         self.MODEL = kwargs.pop('model', ' sin(x) ')
         self.STYLE = kwargs.pop('style', 'TEntry')
         self.STYLE_MODEL = kwargs.pop('style_model', 'TEntry')
@@ -20,7 +20,7 @@ class EntryWithModel(ttk.Entry):
         if 'width' not in kwargs and self.MODEL is not None:
             self.WIDTH = len(self.MODEL) + 2        
         # initialize the remaining parameters
-        super().__init__(master, **kwargs)
+        super().__init__(container, **kwargs)
         
         # other initializations
         self.IS_EMPTY = True
