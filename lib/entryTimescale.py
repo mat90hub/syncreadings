@@ -1,24 +1,20 @@
-import tkinter as tk
-from tkinter import N, S, W, E
+from tkinter import Tk, ttk, font, NORMAL, DISABLED
 from datetime import datetime, timedelta
 from entryDatetime import EntryDatetime
 from entryTimedelta import EntryTimedelta, strptimedelta, strftimedelta
 
 
-class EntryTimeScale(tk.Frame):
+class EntryTimeScale(ttk.Frame):
     
-    def __init__(self, container, 
-                 duration="1h",
-                 step="1min",
-                 **kwargs):
+    def __init__(self, container, duration="1h", step="1min", **kwargs):
         super().__init__(container, **kwargs)
-        self.start_lbl = tk.LabelFrame(container,text="start", padx=5, pady=5)
+        self.start_lbl = ttk.LabelFrame(container,text="start", padding=10)
         self.start_lbl.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
         self.start_entry = EntryDatetime(self.start_lbl)
         self.start_entry.grid()
         self.start_entry.IS_EMPTY = True
 
-        self.end_lbl = tk.LabelFrame(container, text="end", padx=5, pady=5)
+        self.end_lbl = ttk.LabelFrame(container, text="end", padding=10)
         self.end_lbl.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
         self.end_entry = EntryDatetime(self.end_lbl)
         self.end_entry.grid()
@@ -27,12 +23,28 @@ class EntryTimeScale(tk.Frame):
         self.DURATION = strptimedelta(duration)
         self.STEP = strptimedelta(step)
         
-        self.step_lbl = tk.LabelFrame(container, text="step", padx=5, pady=5)
+        self.step_lbl = ttk.LabelFrame(container, text="step", padding=10)
         self.step_lbl.grid(row=0, column=2, sticky="nsew", padx=5, pady=5)
         self.step_entry = EntryTimedelta(self.step_lbl, model=step, width=8)
         self.step_entry.grid()
 
-        self.start_entry.bind("<FocusOut>", self.prepare_end)
+        if 'state' in kwargs:
+            self.STATE = kwargs.pop('state', 'normal')
+            self.start_entry.configure(state=self.STATE)
+            self.end_entry.configure(state=self.STATE)
+            self.step_entry.configure(state=self.STATE)
+        else:
+            self.STATE = NORMAL
+        
+        if 'style' in kwargs:
+            self.STYLE = kwargs.pop('style', 'TEntry')
+            self.start_entry.configure(style=self.STYLE)
+            self.end_entry.configure(style=self.STYLE)
+            self.step_entry.configure(style=self.STYLE)
+        else:
+            self.STYLE = 'TEntry'
+            
+        self.start_entry.bind('<Leave>', self.on_leave)
         
     @property
     def start(self) -> datetime:
@@ -73,7 +85,7 @@ class EntryTimeScale(tk.Frame):
         except Exception as e:
             raise Exception(f"error: {str(e)}")
 
-    def prepare_end(self, event):
+    def on_leave(self, event):
         '''prefill the end entry with the start'''
         print(event)
         if not self.start_entry.isEmpty and self.end_entry.isEmpty:
@@ -85,21 +97,69 @@ class EntryTimeScale(tk.Frame):
 
     def configure(self, **kwargs):
         if 'state' in kwargs:
-            _STATE = kwargs.pop('state')    
-            self.start_entry.configure(state=_STATE)
-            self.end_entry.configure(state=_STATE)
-            self.step_entry.configure(state=_STATE)
+            self.STATE = kwargs.pop('state', 'normal')
+            self.start_entry.configure(state=self.STATE)
+            self.end_entry.configure(state=self.STATE)
+            self.step_entry.configure(state=self.STATE)
 
+        if 'style' in kwargs:
+            self.STYLE = kwargs.pop('style', 'TEntry')
+            self.start_entry.configure(style=self.STYLE)
+            self.end_entry.configure(style=self.STYLE)
+            self.step_entry.configure(style=self.STYLE)
+        
+        super().configure
+
+    def cget(self, property: str):
+        if property == 'state':
+            if str(self.start_entry['state']) == 'disabled' and \
+               str(self.end_entry['state']) == 'disabled' and \
+               str(self.step_entry['state']) == 'disabled':
+                return DISABLED
+            else:
+                return NORMAL
+        else:
+            super().cget(property)
 
 if __name__ == "__main__":
     
-    root = tk.Tk()
+    root = Tk()
     root.title("Test entry of a time scale.")
-    frame = tk.Frame(root,width=15)
-    frame.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
+    root.geometry('2000x800')
+    root.attributes('-topmost', 1)  # keep window on top, while checking the code
 
-    entryTimescale = EntryTimeScale(frame)
-    entryTimescale.grid(row=0,column=0)
+    # content of root shall expand
+    root.columnconfigure(0, weight=1)
+    root.rowconfigure(0, weight=0)
+    root.rowconfigure(1, weight=1)
+    root.rowconfigure(2, weight=0)
+
+    # controlling the size of the default font
+    default_font = font.nametofont('TkDefaultFont')
+    default_font.configure(size=18)
+    root.option_add('*Font', default_font)
+
+    style = ttk.Style()
+    style.configure('red.TFrame', background='red')
+    style.configure('yellow.TFrame', background='yellow')
+    style.configure('black.TEntry', fieldbackground='gray99', foreground='black')
+    style.configure('blue.TEntry', fieldbackground='khaki', foreground='blue')
+    style.configure('gray.TEntry', fieldbackground='gray99', foreground='gray60')
+    style.configure('red.TEntry', fieldbackground='yellow', foreground='red')
+
+    # https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/ttk-map.html 
+
+    frame = ttk.Frame(root)
+    frame.grid(row=0, column=0, sticky="nsew", padx=20, pady=20)
+    # frame.configure(style='red.TFrame')
+    frame.grid_columnconfigure(0, weight=0)
+    frame.grid_columnconfigure(1, weight=1)
+    frame.grid_rowconfigure(0, weight=0)
+    frame.grid_rowconfigure(1, weight=0)
+    frame.grid_rowconfigure(2, weight=1)
+
+    entryTimescale = EntryTimeScale(frame, style='blue.TEntry')
+    entryTimescale.grid(row=0,column=0, rowspan=2, sticky='ew')
     
     # Enter a date ---------------------------------
     entryTimescale.start_entry.enter("2022-02-01 09:00:00")
@@ -107,43 +167,52 @@ if __name__ == "__main__":
     entryTimescale.step_entry.enter("1min")
     # ----------------------------------------------
 
-    frame2 = tk.Frame(root, height = 5, width=26)
-    frame2.grid(row=1,column=0, sticky="nwse", padx=20, pady=0)
+    frame_res = ttk.Frame(root)
+    frame_res.grid(row=1, column=0, sticky="nsew", padx=20, pady=5)
+    # frame.configure(style='red.TFrame')
+    frame_res.grid_columnconfigure(0, weight=0)
+    frame_res.grid_columnconfigure(1, weight=1)
+    frame_res.grid_rowconfigure(0, weight=1)
+    
+    # ttk.Label(frame, text='result:', justify='left', anchor="w").grid(row=1, column=0, padx=(20,10), day=20)
+    ttk.Label(frame_res, text='result:').grid(row=0, column=0, sticky='e', padx=(20,10), pady=20)
+    result = ttk.Label(frame_res, anchor='w', justify='left')
+    result.grid(row=0 ,column=1, sticky="ew", padx=(10,20), pady=20)
 
-    tk.Label(frame2, text='result:', width=6, anchor="w").grid(row=0, column=0)
-    result = tk.Label(frame2, width=46, anchor="w", justify="left", bg='white')
-    result.grid(row=0,column=1, sticky="ne", padx=20, pady=20)
-
-    frame_btn = tk.Frame(root)
+    # ----------------------------------------------
+    frame_btn = ttk.Frame(root)
     frame_btn.grid(row=2, column=0, sticky="nesw", padx=20, pady=20)
-    button_nb = tk.Button(frame_btn, text='ticks number', height=2,
-                          command=lambda: result.configure(text=entryTimescale.ticks_number))
-    button_nb.grid(row=0, column=0, padx=20, pady=50, sticky='nesw')
+    frame_btn.grid_columnconfigure(0, weight=1)
+    frame_btn.grid_columnconfigure(1, weight=1)
+    frame_btn.grid_columnconfigure(2, weight=1)
+    frame_btn.grid_columnconfigure(3, weight=1)
+    frame_btn.grid_rowconfigure(0, weight=1)
 
-    # tk.Label(frame_btn, width=6).grid(row=0, column=1, sticky='nesw')
+    button_nb = ttk.Button(frame_btn, text='ticks number', padding=10,
+                           command=lambda: result.configure(text=entryTimescale.ticks_number))
+    button_nb.grid(row=0, column=0, padx=20, pady=50)
 
-    button_lst = tk.Button(frame_btn, text='ticks list', height=2, 
-                           command=lambda: result.configure(text=entryTimescale.ticks_list))
-    button_lst.grid(row=0, column=2, padx=20, pady=50, sticky='nsw')
+    button_lst = ttk.Button(frame_btn, text='ticks list', padding=10,
+                            command=lambda: result.configure(text=entryTimescale.ticks_list))
+    button_lst.grid(row=0, column=1, padx=20, pady=50)
 
     def switch_disabled():
-        _STATE = entryTimescale.cget("state")
-        if _STATE == "normal":
+        STATE = entryTimescale.cget("state")
+        if STATE == "normal":
             entryTimescale.configure(state="disabled")
             button_disabled.configure(text="enable")
         else:
             entryTimescale.configure(state="normal")
             button_disabled.configure(text="disable")
 
-    button_disabled=tk.Button(frame_btn, text="disabled",
-                              command=switch_disabled)
-    button_disabled.grid(row=0, column=3, padx=20, pady=50, sticky="nsw")
+    button_disabled=ttk.Button(frame_btn, text="disabled", padding=10, command=switch_disabled)
+    button_disabled.grid(row=0, column=2, padx=20, pady=50)
 
-    # tk.Label(frame_btn, width=9).grid(row=0, column=3, sticky='nesw')
+    button_close = ttk.Button(frame_btn, text='close', padding=10, command=lambda: root.destroy())
+    button_close.grid(row=0, column=3, padx=20, pady=50)
 
-    button_close = tk.Button(frame_btn, text='close', height=2, width=7,
-                             command=lambda: root.destroy())
-    button_close.grid(row=0, column=4, padx=20, pady=50, sticky='w')
-
-    root.resizable(False, False)
+    # root.resizable(False, False)
     root.mainloop()
+
+
+# https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/ttk-Entry.html
