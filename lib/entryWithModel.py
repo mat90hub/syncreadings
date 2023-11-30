@@ -82,10 +82,12 @@ class EntryWithModel(ttk.Entry):
 
     def enter(self, value):
         """simulate a user entry."""
-        self.delete(0, END)
-        self.insert(0, value)
-        self.configure(style=self.STYLE)
-        self.on_focus_out(None)
+        if len(value) > 0:
+            self.delete(0, END)
+            self.insert(0, value)
+            self.configure(style=self.STYLE)
+            self.IS_EMPTY = False
+            self.on_leave(None)
 
     def clear(self):
         self.delete(0, END)
@@ -113,16 +115,17 @@ class EntryWithModel(ttk.Entry):
         _VAL = self.get()
         if self.IS_EMPTY and len(_VAL) == 0:
             self.insert(0, self.MODEL)
-            self.configure(style=self.STYLE_MODEL)            
+            self.configure(style=self.STYLE_MODEL)
         elif isfloat(_VAL):
             if self.MIN != None and self.MAX != None:                        
                 _VAL = float(_VAL)
                 if _VAL < self.MIN or _VAL > self.MAX:
-                    self.raise_entry_error() 
+                    self.raise_entry_error()
+        return 'break'
 
     def raise_entry_error(self):
         self.ENTRY_ERROR = True
-        self.configure(self=self.STYLE_ERROR)
+        self.configure(style=self.STYLE_ERROR)
 
 if __name__ == '__main__':
      
