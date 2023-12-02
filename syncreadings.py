@@ -1,6 +1,5 @@
 import os
-import tkinter as tk
-from tkinter import font, ttk, scrolledtext
+from tkinter import Tk, font, ttk, Menu, scrolledtext, WORD, DISABLED, NORMAL, END
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 from tkinter import messagebox
 
@@ -12,9 +11,9 @@ from lib.my_dialogs import text_message, about_window, user_manual
 from lib.my_dialogs import plot_source, plot_table
 
 
-class Application(tk.Tk):
+class Application(Tk):
     def __init__(self):
-        tk.Tk.__init__(self)
+        Tk.__init__(self)
         self.version = '0.1'
         self.title(f'data reformating, v.{self.version}')
         self.settings = get_default_choices()
@@ -33,21 +32,17 @@ class Application(tk.Tk):
         self.frame.grid(row=0, column=0, sticky='nswe')
         # self.textbox = tk.Text(self.frame, state=tk.DISABLED);
         self.textbox = scrolledtext.ScrolledText(
-            self.frame, wrap=tk.WORD, state=tk.DISABLED)
+            self.frame, wrap=WORD, state=DISABLED)
         self.textbox.grid(row=0, column=0, sticky='nswe')
 
         # add a footer to give general information
-        self.footer = tk.Frame(self, height=20)
+        self.footer = ttk.Frame(self, height=20)
         self.footer.grid_columnconfigure(0, weight=1)
         self.footer.grid_rowconfigure(0, weight=1)
         self.footer.grid(row=1, column=0, sticky='nswe')
 
-        border = ttk.Separator(self.footer, orient='horizontal')
-        border.pack(side='top', fill='x')
-
-        self.footer_lbl = tk.Label(self.footer,
-                                   text='input file to be loaded...')
-        self.footer_lbl.pack(side='left')
+        self.footer_lbl = ttk.Label(self.footer, text='input file to be loaded...')
+        self.footer_lbl.grid(sticky='w', padx=20)
 
     def adapt_to_screen_size(self):
         """Define font size to adapt to the screen."""
@@ -68,9 +63,9 @@ class Application(tk.Tk):
 
     def create_menu_bar(self):
 
-        menu_bar = tk.Menu(self)
+        menu_bar = Menu(self)
 
-        menu_file = tk.Menu(menu_bar, tearoff=0)
+        menu_file = Menu(menu_bar, tearoff=0)
         menu_file.add_command(label='Load File',
                               underline=0,
                               accelerator='CTRL+O',
@@ -95,7 +90,7 @@ class Application(tk.Tk):
         self.bind_all('<Control-c>', lambda _: self.close_file())
         self.bind_all('<Control-x>', lambda _: self.destroy())
 
-        menu_sets = tk.Menu(menu_bar, tearoff=0)
+        menu_sets = Menu(menu_bar, tearoff=0)
         menu_sets.add_command(label='Sets analysis',
                               underline=0,
                               accelerator='CTRL+A',
@@ -126,7 +121,7 @@ class Application(tk.Tk):
         self.bind_all('<Control-s>', lambda _: self.export_to_csv())
         self.bind_all('<Control-l>', lambda _: self.export_to_xlsx())
 
-        menu_plot = tk.Menu(menu_bar, tearoff=0)
+        menu_plot = Menu(menu_bar, tearoff=0)
         menu_plot.add_command(label='Plot source measures',
                               font=self.cmd_font,
                               command=self.plot_source)
@@ -138,7 +133,7 @@ class Application(tk.Tk):
                              font=self.menu_font,
                              menu=menu_plot)
 
-        menu_help = tk.Menu(menu_bar, tearoff=0)
+        menu_help = Menu(menu_bar, tearoff=0)
         menu_help.add_command(label='About',
                               font=self.cmd_font,
                               command=self.about_window)
@@ -162,10 +157,10 @@ class Application(tk.Tk):
         self.footer_lbl.configure(
             text=f"file '{os.path.basename(self.input_file)}' loaded"
         )
-        self.textbox.config(state=tk.NORMAL)
-        self.textbox.delete('1.0', tk.END)
-        self.textbox.insert(tk.END, content)
-        self.textbox.config(state=tk.DISABLED)
+        self.textbox.config(state=NORMAL)
+        self.textbox.delete('1.0', END)
+        self.textbox.insert(END, content)
+        self.textbox.config(state=DISABLED)
 
     def sets_analysis(self):
         if not self.input_file:
@@ -188,10 +183,10 @@ class Application(tk.Tk):
         elif not self.data_in:
             self.data_in = read_measures(self.input_file)
         self.data_out = synchronized_sets(self.data_in, self.settings)
-        self.textbox.config(state=tk.NORMAL)
-        self.textbox.delete('1.0', tk.END)
-        self.textbox.insert(tk.END, self.data_out.to_string(index=True))
-        self.textbox.config(state=tk.DISABLED)
+        self.textbox.config(state=NORMAL)
+        self.textbox.delete('1.0', END)
+        self.textbox.insert(END, self.data_out.to_string(index=True))
+        self.textbox.config(state=DISABLED)
         self.footer_lbl.configure(
             text=f"File '{os.path.basename(self.input_file)}' loaded, data tabulated")
 
@@ -238,9 +233,9 @@ class Application(tk.Tk):
         self.data_out = pd.DataFrame()
         self.sets_char = {}
         self.input_file = ''
-        self.textbox.config(state=tk.NORMAL)
-        self.textbox.delete('1.0', tk.END)
-        self.textbox.config(state=tk.DISABLED)
+        self.textbox.config(state=NORMAL)
+        self.textbox.delete('1.0', END)
+        self.textbox.config(state=DISABLED)
 
     def plot_source(self):
         """Plot on an independent window the graph of the source measures"""
