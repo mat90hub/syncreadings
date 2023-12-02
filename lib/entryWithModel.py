@@ -10,7 +10,7 @@ def isfloat(num):
 class EntryWithModel(ttk.Entry):
     """Entry widget with a model."""
     def __init__(self, container, **kwargs):
-        self.MODEL = kwargs.pop('model', ' sin(x) ')
+        self.MODEL = kwargs.pop('model', 'sin(x)')
         self.STYLE = kwargs.pop('style', 'TEntry')
         self.STYLE_MODEL = kwargs.pop('style_model', 'TEntry')
         self.STYLE_ERROR = kwargs.pop('style_error', 'TEntry')
@@ -18,15 +18,12 @@ class EntryWithModel(ttk.Entry):
         self.MAX = kwargs.pop('max', 100)
         # if no width give, choose a sufficient width to show content
         if 'width' not in kwargs and self.MODEL is not None:
-            self.WIDTH = len(self.MODEL) + 2        
-        # initialize the remaining parameters
-        super().__init__(container, **kwargs)
+            self.WIDTH = len(self.MODEL)
         
-        # other initializations
+        super().__init__(container, style=self.STYLE_MODEL, **kwargs)
         self.IS_EMPTY = True
         self.ENTRY_ERROR = False
-        super().insert(0, self.MODEL)        
-        super().configure(style=self.STYLE_MODEL)
+        super().insert(0, self.MODEL)
 
         self.bind('<KeyRelease>', self.on_keyrelease)
         self.bind('<Leave>', self.on_leave)
@@ -147,10 +144,11 @@ if __name__ == '__main__':
     style = ttk.Style()
     style.configure('red.TFrame', background='red')
     style.configure('yellow.TFrame', background='yellow')
-    style.configure('black.TEntry', fieldbackground='gray99', foreground='black')
-    style.configure('blue.TEntry', fieldbackground='khaki', foreground='blue')
-    style.configure('gray.TEntry', fieldbackground='gray99', foreground='gray60')
-    style.configure('red.TEntry', fieldbackground='yellow', foreground='red')
+    style.configure('black.TEntry', fieldbackground='gray99', foreground='black', padding=(50,1,50,1))
+    # ipad_left,ipad_top,ipad_right,ipad_bottom 
+    style.configure('blue.TEntry', fieldbackground='khaki', foreground='blue', padding=(50,1,50,1))
+    style.configure('gray.TEntry', fieldbackground='gray99', foreground='gray60', padding=(50,1,50,1))
+    style.configure('red.TEntry', fieldbackground='yellow', foreground='red', padding=(50,1,50,1))
     
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     frame = ttk.Frame(root)
@@ -162,7 +160,7 @@ if __name__ == '__main__':
     frame.grid_rowconfigure(1, weight=0)
     frame.grid_rowconfigure(2, weight=1)
 
-    entryWithModel = EntryWithModel(frame, style_model='gray.TEntry', style_error='red.TEntry')
+    entryWithModel = EntryWithModel(frame, style='black.TEntry', style_model='gray.TEntry', style_error='red.TEntry')
     entryWithModel.grid(row=0, column=0, columnspan=2, pady=20, padx=20, sticky='ew')
     
     variable = StringVar(root, 'default result')
@@ -188,9 +186,9 @@ if __name__ == '__main__':
     # Button frame:
     # rapid and rough check of configure for new and old properties
     button_mdl = ttk.Button(frame_btn, text='model',
-                            command=lambda: {entryWithModel.configure(model=' arctan(x) ')
-                                            if (entryWithModel.cget('model')==' sin(x) ')
-                                            else entryWithModel.configure(model=' sin(x) ')})
+                            command=lambda: {entryWithModel.configure(model='arctan(x)')
+                                            if (entryWithModel.cget('model')=='sin(x)')
+                                            else entryWithModel.configure(model='sin(x)')})
     button_mdl.grid(row=0, column=0, padx=40, pady=20, ipadx=10, sticky='s')
 
     button_bg = ttk.Button(frame_btn, text='color',

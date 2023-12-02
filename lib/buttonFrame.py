@@ -1,5 +1,4 @@
-import tkinter as tk
-from tkinter import ttk, font
+from tkinter import Tk, ttk
 
 class ButtonFrame():
     ROWS = []
@@ -86,7 +85,7 @@ class ButtonFrame():
 
 if __name__ == "__main__":
 
-    root = tk.Tk()
+    root = Tk()
     root.title("test ButtonPlus.")
     root.geometry("2000x500")
 

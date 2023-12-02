@@ -7,26 +7,34 @@ from entryTimedelta import EntryTimedelta, strptimedelta, strftimedelta
 class EntryTimeScale(ttk.Frame):
     
     def __init__(self, container, duration="1h", step="1min", **kwargs):
+
+        self.STYLE_ENTRY = kwargs.pop('style_entry','TEntry')
+        self.STYLE_LABEL = kwargs.pop('style_label', 'TLabelFrame')
         super().__init__(container, **kwargs)
-        self.start_lbl = ttk.LabelFrame(container,text="start", padding=10)
+        self.start_lbl = ttk.LabelFrame(container,text="start", padding=(10,1,10,1))
         self.start_lbl.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
-        self.start_entry = EntryDatetime(self.start_lbl)
+        self.start_entry = EntryDatetime(self.start_lbl, style=self.STYLE_ENTRY)
         self.start_entry.grid()
         self.start_entry.IS_EMPTY = True
 
-        self.end_lbl = ttk.LabelFrame(container, text="end", padding=10)
+        self.end_lbl = ttk.LabelFrame(container, text="end", padding=(10,1,10,1))
         self.end_lbl.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
-        self.end_entry = EntryDatetime(self.end_lbl)
+        self.end_entry = EntryDatetime(self.end_lbl, style=self.STYLE_ENTRY)
         self.end_entry.grid()
         self.end_entry.IS_EMPTY = True
         
         self.DURATION = strptimedelta(duration)
         self.STEP = strptimedelta(step)
         
-        self.step_lbl = ttk.LabelFrame(container, text="step", padding=10)
+        self.step_lbl = ttk.LabelFrame(container, text="step", padding=(10,1,10,1))
         self.step_lbl.grid(row=0, column=2, sticky="nsew", padx=5, pady=5)
-        self.step_entry = EntryTimedelta(self.step_lbl, model=step, width=8)
+        self.step_entry = EntryTimedelta(self.step_lbl, model=step, style=self.STYLE_ENTRY)
         self.step_entry.grid()
+
+        container.rowconfigure(0, weight=0)
+        container.columnconfigure(0, weight=0)
+        container.columnconfigure(1, weight=0)
+        container.columnconfigure(2, weight=0)
 
         if 'state' in kwargs:
             self.STATE = kwargs.pop('state', 'normal')
@@ -43,7 +51,12 @@ class EntryTimeScale(ttk.Frame):
             self.step_entry.configure(style=self.STYLE)
         else:
             self.STYLE = 'TEntry'
-            
+        
+        # define style for small labels on the Labelframe and padding for TEntry
+        self.style = ttk.Style(self)
+        self.style.configure('TLabelframe.Label', font=('Helvetica', 10, 'bold', 'italic'), foreground='gray60')
+        self.style.configure('TEntry', padding=(50,1,50,1))
+
         self.start_entry.bind('<Leave>', self.on_leave)
         
     @property
@@ -122,16 +135,15 @@ class EntryTimeScale(ttk.Frame):
             super().cget(property)
 
 if __name__ == "__main__":
-    
     root = Tk()
     root.title("Test entry of a time scale.")
-    root.geometry('2000x800')
+    root.geometry('2500x800')
     root.attributes('-topmost', 1)  # keep window on top, while checking the code
 
     # content of root shall expand
     root.columnconfigure(0, weight=1)
     root.rowconfigure(0, weight=0)
-    root.rowconfigure(1, weight=1)
+    root.rowconfigure(1, weight=0)
     root.rowconfigure(2, weight=0)
 
     # controlling the size of the default font
@@ -142,10 +154,14 @@ if __name__ == "__main__":
     style = ttk.Style()
     style.configure('red.TFrame', background='red')
     style.configure('yellow.TFrame', background='yellow')
-    style.configure('black.TEntry', fieldbackground='gray99', foreground='black')
-    style.configure('blue.TEntry', fieldbackground='khaki', foreground='blue')
-    style.configure('gray.TEntry', fieldbackground='gray99', foreground='gray60')
-    style.configure('red.TEntry', fieldbackground='yellow', foreground='red')
+    style.configure('black.TEntry', fieldbackground='gray99', foreground='black', padding=(50,1,50,1))
+    style.configure('blue.TEntry', fieldbackground='khaki', foreground='blue', padding=(50,1,50,1))
+    style.configure('gray.TEntry', fieldbackground='gray99', foreground='gray60', padding=(50,1,50,1))
+    style.configure('red.TEntry', fieldbackground='yellow', foreground='red', padding=(50,1,50,1))
+    
+    # change the size and color of the Label of the Labelframe
+    # smallFont = font.Font(family='Helvetica', name='smallFont', size=9, weight='bold', slant='italic')
+    # style.configure('TLabelframe.Label', font=smallFont, foreground='gray60')
 
     # https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/ttk-map.html 
 
@@ -158,7 +174,7 @@ if __name__ == "__main__":
     frame.grid_rowconfigure(1, weight=0)
     frame.grid_rowconfigure(2, weight=1)
 
-    entryTimescale = EntryTimeScale(frame, style='blue.TEntry')
+    entryTimescale = EntryTimeScale(frame, style_entry='blue.TEntry')
     entryTimescale.grid(row=0,column=0, rowspan=2, sticky='ew')
     
     # Enter a date ---------------------------------

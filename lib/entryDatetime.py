@@ -11,14 +11,10 @@ class EntryDatetime(EntryWithModel):
     """
     def __init__(self, container, **kwargs):
         
-        super().__init__(container, **kwargs)
-        
         self.MODEL = kwargs.pop('model', 'YYYY-MM-DD HH:MM:SS')
         self.DATE_FORMAT = kwargs.pop('format','%Y-%m-%d %H:%M:%S')        
-        if 'width' not in kwargs:
-            self.WIDTH = len(self.MODEL) + 2
-        else:
-            self.WIDTH = kwargs['width']
+        super().__init__(container, model=self.MODEL, **kwargs)
+
         self.configure(style=self.STYLE_MODEL, width=self.WIDTH)
         self.delete(0, END)
         self.insert(0, self.MODEL)
@@ -231,7 +227,7 @@ class EntryDatetime(EntryWithModel):
             self.raise_entry_error()
 
     def on_leave(self, event=None):
-        super().on_leave(event)        
+        super().on_leave(event)
         if not self.IS_EMPTY:
             self.final_validation(event)
     
@@ -256,11 +252,10 @@ if __name__ == '__main__':
     style = ttk.Style()
     style.configure('red.TFrame', background='red')
     style.configure('yellow.TFrame', background='yellow')
-    style.configure('grey.TEntry', foreground='grey', fieldbackground='gray99')
-    style.configure('red.TEntry', foreground='yellow', fieldbackground='red')
-    style.configure('black.TEntry', foreground='black', fieldbackground='gray99')
-    style.configure('blue.TEntry', foreground='blue', fieldbackground='gray85')
-    
+    style.configure('grey.TEntry', foreground='grey', fieldbackground='gray99', padding=(50,1,50,1))
+    style.configure('red.TEntry', foreground='yellow', fieldbackground='red', padding=(50,1,50,1))
+    style.configure('black.TEntry', foreground='black', fieldbackground='gray99', padding=(50,1,50,1))
+    style.configure('blue.TEntry', foreground='blue', fieldbackground='gray85', padding=(50,1,50,1))
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     frame = ttk.Frame(root, style='yellow.TFrame')
@@ -268,18 +263,16 @@ if __name__ == '__main__':
     # frame.configure(style='red.TFrame')
 
     # rules for expansion in frame
-    frame.grid_columnconfigure(0, weight=0)
-    frame.grid_columnconfigure(1, weight=1)
+    frame.grid_columnconfigure(0, weight=1)
     frame.grid_rowconfigure(0, weight=0)
     frame.grid_rowconfigure(1, weight=1)
 
-    datetime_entry = EntryDatetime(frame, style='black.TEntry')
-    datetime_entry.grid(sticky='n', padx=50, pady=50)
+    datetime_entry = EntryDatetime(frame, style='black.TEntry', style_model='grey.TEntry', style_error='red.TEntry')
+    datetime_entry.grid(sticky='w', padx=50, pady=50)
 
     # enter a default datetime ---------------------
-    datetime_entry.delete(0, END)
-    datetime_entry.insert(0, '2010-10-01 09:34:23')
-    # datetime_entry.insert(1, '2010-14-32 45:34:23')   # test a wrong date!
+    datetime_entry.enter('2010-10-01 09:34:23')
+    # datetime_entry.enter('2010-14-32 45:34:23')   # test a wrong date!
     
     # datetime_entry.configure(foreground='black')
     datetime_entry.IS_EMPTY = False

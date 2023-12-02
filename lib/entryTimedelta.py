@@ -66,9 +66,9 @@ if __name__ == '__main__':
     
     style = ttk.Style()
     style.configure('button.TFrame', background='lightskyblue4')
-    style.configure('black.TEntry', fieldbackground='gray99', foreground='black')
-    style.configure('gray.TEntry', fieldbackground='gray99', foreground='gray60')
-    style.configure('red.TEntry', fieldbackground='yellow', foreground='red')
+    style.configure('black.TEntry', fieldbackground='gray99', foreground='black', padding=(50,1,50,1))
+    style.configure('gray.TEntry', fieldbackground='gray99', foreground='gray60', padding=(50,1,50,1))
+    style.configure('red.TEntry', fieldbackground='yellow', foreground='red', padding=(50,1,50,1))
 
     # controlling the size of the default font
     default_font = font.nametofont('TkDefaultFont')
