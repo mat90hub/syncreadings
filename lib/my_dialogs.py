@@ -63,6 +63,7 @@ def user_manual(root, html_file: str, title='User instructions'):
 def display_list(root, datalist: list, title: str='Data List'):
     _WIN = tk.Toplevel(root)
     _WIN.title(title)
+    _WIN.geometry("1000x800")
 
     _SCROLLBAR = ttk.Scrollbar(_WIN, orient=tk.VERTICAL)
     _LIST = tk.Listbox(
@@ -79,6 +80,11 @@ def display_list(root, datalist: list, title: str='Data List'):
 
     _SCROLLBAR.config(command=_LIST.yview)
     _SCROLLBAR.grid(row=0, column=1, sticky='ns')
+
+    # give a minimum width to the scrollbar
+    style = ttk.Style()
+    style.configure('Vertical.TScrollbar', arrowsize=40)
+
 
     _BTN = ttk.Button(_WIN, text='close', command=lambda: _WIN.destroy())
     _BTN.grid(row=1, column=0, stick='s')

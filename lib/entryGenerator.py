@@ -1,5 +1,4 @@
-import tkinter as tk
-
+from tkinter import Tk, ttk, font, Toplevel, TOP, BOTH
 from entryWithModel import EntryWithModel
 from entryTimescale import EntryTimeScale
 from my_dialogs import display_list
@@ -21,7 +20,7 @@ plot_settings = {
     'ylim': (0,200),
 }
 
-class EntryGenerator(tk.Frame):
+class EntryGenerator(ttk.Frame):
 
     def __init__(self, container, name, accuracy=3,
                  duration='1h', step='1min', **kwargs):
@@ -29,65 +28,62 @@ class EntryGenerator(tk.Frame):
         super().__init__(container, **kwargs)
 
         # -------------------------------------------------
-        frame1 = tk.Frame(container)
+        frame1 = ttk.Frame(container, padding=5)
         frame1.grid(row=0, column=0, sticky='nsew')
-        self.main_lbl = tk.LabelFrame(frame1, text=name, padx=5, pady=5)
-        self.main_lbl.grid(row=0, column=0, sticky='nsew')
+        self.main_lbl = ttk.LabelFrame(frame1, text=name)
+        self.main_lbl.grid(row=0, column=0, padx=5, pady=5, sticky='nsew')
 
-        frame11 = tk.Frame(self.main_lbl)
+        frame11 = ttk.Frame(self.main_lbl)
         frame11.grid(row=0, column=0, sticky='nesw')
 
-        self.timescale = EntryTimeScale(frame11,
-                                        duration=duration,
-                                        step=step)
+        self.timescale = EntryTimeScale(frame11, duration=duration, step=step)
         self.timescale.grid(row=0, column=0, sticky='nsew')
         # -------------------------------------------------
-        frame12 = tk.Frame(self.main_lbl)
+        frame12 = ttk.Frame(self.main_lbl)
         frame12.grid(row=1, column=0, sticky='news')
 
-        self.gen_lbl = tk.LabelFrame(frame12, text='Generate the set',
-                                     padx=5, pady=5)
-        self.gen_lbl.grid(row=0, column=0, sticky='nsew')
+        self.gen_lbl = ttk.LabelFrame(frame12, text='Generate the set', padding=5)
+        self.gen_lbl.grid(row=0, column=0, padx=5, pady=5, sticky='nsew')
 
-        frame21 = tk.Frame(self.gen_lbl)
+        frame21 = ttk.Frame(self.gen_lbl)
         frame21.grid(row=0, column=0, sticky='nsew')
 
-        self.func_lbl = tk.LabelFrame(frame21, text='func.', padx=20, pady=5)
+        self.func_lbl = ttk.LabelFrame(frame21, text='func.', padding=(20,5))
         self.func_lbl.grid(row=0, column=0, padx=20, pady=10)
         self.func_entry = EntryWithModel(self.func_lbl, model='X*X', width=15)
         self.func_entry.grid()
 
-        self.min_lbl = tk.LabelFrame(frame21, text='min.', padx=20, pady=5)
+        self.min_lbl = ttk.LabelFrame(frame21, text='min.', padding=(20,5))
         self.min_lbl.grid(row=0, column=1, padx=20, pady=10)
         self.min_entry = EntryWithModel(self.min_lbl, model='00.0', width=4)
         self.min_entry.grid()
 
-        self.max_lbl = tk.LabelFrame(frame21, text='max.', padx=20, pady=5)
+        self.max_lbl = ttk.LabelFrame(frame21, text='max.', padding=(20,5))
         self.max_lbl.grid(row=0, column=2, padx=20, pady=10)
         self.max_entry = EntryWithModel(self.max_lbl, model='00.0', width=4)
         self.max_entry.grid()
 
-        self.rand_lbl = tk.LabelFrame(frame21, text='rand.', padx=20, pady=5)
+        self.rand_lbl = ttk.LabelFrame(frame21, text='rand.', padding=(20,5))
         self.rand_lbl.grid(row=0, column=3, padx=20, pady=10)
         self.rand_entry = EntryWithModel(self.rand_lbl, model='0.0%', width=5,
                                          min=0, max=100)
         self.rand_entry.grid()
 
         # -------------------------------------------------
-        frame22 = tk.Frame(self.gen_lbl)
+        frame22 = ttk.Frame(self.gen_lbl)
         frame22.grid(row=0, column=1, sticky='nswe')
 
-        self.gen_btn = tk.Button(frame22, text='gen.', height=1, padx=20, pady=5,
-                                 command=self.generate_set)
+        self.gen_btn = ttk.Button(frame22, text='gen.', padding=(20,5),
+                                  command=self.generate_set)
         self.gen_btn.grid(row=0, column=0, padx=20, pady=10, sticky='ews')
-        self.list_btn = tk.Button(frame22, text='list', height=1, padx=20, pady=5,
-                                  command=self.list_data, state='disabled')
+        self.list_btn = ttk.Button(frame22, text='list', padding=(20,5),
+                                   command=self.list_data, state='disabled')
         self.list_btn.grid(row=1, column=0, padx=20, pady=10, sticky='ews')
-        self.plot_btn = tk.Button(frame22, text='plot', height=1, padx=20, pady=5,
-                                  command=self.plot_set, state='disabled')
+        self.plot_btn = ttk.Button(frame22, text='plot', padding=(20,5),
+                                   command=self.plot_set, state='disabled')
         self.plot_btn.grid(row=0, column=1, padx=20, pady=10, sticky='ews')
-        self.reset_btn = tk.Button(frame22, text='new', height=1, padx=20, pady=5,
-                                  command=self.reset_set, state='disabled')
+        self.reset_btn = ttk.Button(frame22, text='new', padding=(20,5),
+                                    command=self.reset_set, state='disabled')
         self.reset_btn.grid(row=1, column=1, padx=20, pady=10, sticky='ews')
         # -------------------------------------------------
 
@@ -173,7 +169,11 @@ class EntryGenerator(tk.Frame):
     def generate_set(self):
         _MIN = float(self.min_entry.get())
         _MAX = float(self.max_entry.get())
-        _COEF_RAND = float(self.rand_entry.get())/100
+        _RAND = self.rand_entry.get()
+        if _RAND[-1:] == "%":
+            _COEF_RAND = float(_RAND[:-1])/100
+        else:
+            _COEF_RAND = float(_RAND)/100
         if _COEF_RAND < 0 or _COEF_RAND > 1:
             # entry error
             self.rand_entry.configure(background='red', foreground='yellow')
@@ -222,7 +222,7 @@ class EntryGenerator(tk.Frame):
                  settings=plot_settings):
         if len(self.Y_values) == 0:
             return
-        _WIN = tk.Toplevel(root)
+        _WIN = Toplevel(root)
         _WIN.title(title)
         figure = Figure(figsize=(6,4), dpi=100)
         canvas = FigureCanvasTkAgg(figure, _WIN)
@@ -241,7 +241,7 @@ class EntryGenerator(tk.Frame):
                         fontsize=int(settings['labelsize']*1.8),
                         fontweight='bold')
         canvas_widget = canvas.get_tk_widget()
-        canvas_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        canvas_widget.pack(side=TOP, fill=BOTH, expand=True)
         canvas_widget.configure(width=settings['width'], height=settings['height'])
 
     def reset_set(self):
@@ -252,10 +252,30 @@ class EntryGenerator(tk.Frame):
 
 if __name__ == '__main__':
 
-    root = tk.Tk()
+    root = Tk()
     root.title('Test entry of a generator.')
-    frame = tk.Frame(root,width=15, padx=40, pady=20)
-    frame.grid(row=0, column=0, sticky='nsew')
+    root.geometry('2300x800')
+    # root.attributes('-topmost', 1)  # keep window on top, while checking the code
+
+    # controlling the size of the default font
+    default_font = font.nametofont('TkDefaultFont')
+    default_font.configure(size=12)
+    root.option_add('*Font', default_font)
+
+    style = ttk.Style()
+    style.configure('light.TFrame', background='cornsilk')
+    style.configure('light.TLabel', background='cornsilk')
+    style.configure('red.TFrame', background='red')
+    style.configure('yellow.TFrame', background='yellow')
+    style.configure('black.TEntry', fieldbackground='gray99', foreground='black')
+    style.configure('blue.TEntry', fieldbackground='khaki', foreground='blue')
+    style.configure('gray.TEntry', fieldbackground='gray99', foreground='gray60')
+    style.configure('red.TEntry', fieldbackground='yellow', foreground='red')
+
+    frame = ttk.Frame(root)
+    frame.grid(row=0, column=0, padx=40, pady=20, sticky='nsew')
+    frame.rowconfigure(0, weight=1)
+    frame.columnconfigure(0, weight=1)
 
     entryGenerator = EntryGenerator(frame, name='set 01')
     entryGenerator.grid(row=0,column=0, sticky='nesw')
@@ -266,8 +286,10 @@ if __name__ == '__main__':
     entryGenerator.timescale.step_entry.enter('1min')
     # ------------------------------------------------------
 
-    frame_btn = tk.Frame(root)
+    frame_btn = ttk.Frame(root)
     frame_btn.grid(row=1, column=0, sticky='nsew')
+    frame_btn.rowconfigure(0, weight=1)
+    frame_btn.columnconfigure(0, weight=1)
 
     """
     def open_list():
@@ -275,19 +297,16 @@ if __name__ == '__main__':
 
     button_list = tk.Button(frame_btn, text='list data', state='disabled',
                             command=open_list)
-    button_list.pack(side=tk.LEFT, padx=20, pady=20)
+    button_list.grid(row=0, column=0, padx=20, pady=20)
     """
 
-    button_close = tk.Button(frame_btn, text='close',
-                             command=lambda: root.destroy())
-    button_close.pack(side=tk.RIGHT, padx=20, pady=20)
+    button_close = ttk.Button(frame_btn, text='close', command=lambda: root.destroy())
+    button_close.grid(row=0, column=0, padx=20, pady=20)
 
-    frame_status = tk.Frame(root)
+    frame_status = ttk.Frame(root, style='light.TFrame')
     frame_status.grid(row=2, column=0, padx=20, pady=20, sticky='sew')
-    status_lbl= tk.Label(frame_status, text='status: ', padx=10, pady=10,
-                         highlightbackground='grey', highlightthickness=3,
-                         width=62, anchor='w')
-    status_lbl.grid(sticky='new')
+    status_lbl= ttk.Label(frame_status, text='status: ', padding=10, anchor='w', style='light.TLabel')
+    status_lbl.grid(sticky='nsew')
 
     def status_update(event):
         if event == 'set generated event':
