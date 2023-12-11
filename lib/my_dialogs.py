@@ -125,7 +125,7 @@ def format_x_axis(axes, data):
         axes.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d %H:%M'))
 
 
-def plot_source(root, datasets: dict, title='Graphs', settings=plot_settings):
+def display_source_plot(root, datasets: dict, title='Graphs', settings=plot_settings):
     """Independent window containing graph from MatPlotLib."""
     _WIN = tk.Toplevel(root)
     _WIN.title('Graph of the source measures.')
@@ -164,7 +164,7 @@ def plot_source(root, datasets: dict, title='Graphs', settings=plot_settings):
 # -------------------------------------------------------------------------------
 import pandas as pd
 # -------------------------------------------------------------------------------
-def plot_table(root, table: pd.DataFrame, title='Graphs', settings=plot_settings):
+def display_table(root, table: pd.DataFrame, title='Graphs', settings=plot_settings):
     """Independent window containing graph from MatPlotLib."""
     _WIN = tk.Toplevel(root)
     _WIN.title(title)

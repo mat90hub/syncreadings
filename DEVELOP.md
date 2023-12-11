@@ -18,7 +18,6 @@ The files of the virtual envrionement are stored under the directory `/.venv`.
 
 The file `pyproject.toml` contains the information on the project such as its dependencies, the version of Python used.
 
-
 ## Working with Visual Studio Code
 
 To work confortably with VSCode, I have the following addins:
@@ -28,7 +27,6 @@ To work confortably with VSCode, I have the following addins:
 | Python                      | IntelliSense, Microsoft | For using Python                                                                                                                                                                                                                  |
 | Python Environement Manager | Don Jayamanne           | Allow in particular to activate the Python of the virual<br />environament if it was not done at launch time.                                                                                                                     |
 | reStructuredText            | LeXstudio Inc.          | Aide pour les fichiers RST utilisés par Sphinx et en<br />particulier pour prévisualiser. Mais il ne faut pas <br />installer l'add-in Esbonio qui fonctionne avec Rst Preview<br />qui sont alors incompatibles (à creuser) |
-
 
 ## Documentation with Sphinx
 
@@ -42,3 +40,18 @@ make html
 
 The documentation will generated unde the directory `doc/_build/html`.
 
+## Making an executable
+
+I use pyinstaller with the following
+
+```shell
+pyinstaller syncreadings.py --hidden-import='PIL._tkinter_finder'
+```
+
+and one must be unde the virtual environement to have all libraries
+available.
+
+
+## Concealing source code
+
+[consealing source code](https://wiki.python.org/moin/Asking%20for%20Help/How%20do%20you%20protect%20Python%20source%20code%3F) is not simple with Python

@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import os
 from tkinter import Tk, font, ttk, Menu, scrolledtext, WORD, DISABLED, NORMAL, END
 from tkinter.filedialog import askopenfilename, asksaveasfilename
@@ -8,7 +10,7 @@ from lib.setsManagement import synchronized_sets, report_on_sets
 import pandas as pd
 
 from lib.my_dialogs import text_message, about_window, user_manual
-from lib.my_dialogs import plot_source, plot_table
+from lib.my_dialogs import display_source_plot, display_table
 
 
 class Application(Tk):
@@ -245,7 +247,7 @@ class Application(Tk):
                         message='Load first an input file.')
         elif not self.data_in:
             self.data_in = read_measures(self.input_file)
-        plot_source(self, self.data_in, title='Source measures.')
+        display_source_plot(self, self.data_in, title='Source measures.')
 
     def plot_table(self):
         """Plot the synchronized table."""
@@ -258,7 +260,7 @@ class Application(Tk):
                 title='Data sets no re-formatted',
                 message='Re-format first the sets of data into a table.')
         else:
-            plot_table(self, self.data_out, title='Synchronized measures.')
+            display_table(self, self.data_out, title='Synchronized measures.')
     
     def plot_compare(self):
         """Plot the source measures with their synchronized versions."""
@@ -271,7 +273,7 @@ class Application(Tk):
                 title='Data sets no re-formatted',
                 message='Re-format first the sets of data into a table.')
         else:
-            plot_table(self, self.data_out, title='Synchronized measures.')
+            display_table(self, self.data_out, title='Synchronized measures.')
 
     def about_window(self):
         """Window giving general information on the application."""
